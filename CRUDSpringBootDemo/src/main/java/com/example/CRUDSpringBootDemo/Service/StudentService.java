@@ -19,14 +19,14 @@ public class StudentService {
     }
 
     public Student createStudent(Student studentReq) {
-
+        studentReq.setDeleted(false);
         Student studentResp = studentRepository.save(studentReq);
         return studentResp;
     }
 
     public Student getStudent(Long id) {
 
-        Optional<Student> studentResp = studentRepository.findById(id);
+        Optional<Student> studentResp = studentRepository.findByIdAndDeletedIsFalse(id);
         if (studentResp.isPresent()) {
             return studentResp.get();
         }
@@ -34,12 +34,11 @@ public class StudentService {
     }
 
     public List<Student> getAllStudent() {
-        List<Student> studentList = studentRepository.findAll();
-        return studentList;
+        return studentRepository.findByDeletedIsFalse();
     }
 
     public Student updateStudent(Long id, Student studentReq) {
-        Optional<Student> existingStudent = studentRepository.findById(id);
+        Optional<Student> existingStudent = studentRepository.findByIdAndDeletedIsFalse(id);
 
         if(existingStudent.isEmpty()) {
             return null;
@@ -51,6 +50,7 @@ public class StudentService {
         studentToSave.setRollNo(studentReq.getRollNo());
         studentToSave.setSubject(studentReq.getSubject());
         studentToSave.setEmail(studentReq.getEmail());
+        studentToSave.setDeleted(false);
 
         return studentRepository.save(studentToSave);
     }
@@ -63,6 +63,22 @@ public class StudentService {
         }
 
         studentRepository.deleteById(id);
+        return true;
+    }
+
+    public boolean deleteStudentSoftly(Long id) {
+        Boolean isDeleted = studentRepository.existsById(id);
+        Optional<Student> existingStudent = studentRepository.findByIdAndDeletedIsFalse(id);
+
+        if(existingStudent.isEmpty()) {
+            return false;
+        }
+
+        Student studentToSave = existingStudent.get();
+        studentToSave.setDeleted(true);
+
+        studentRepository.save(studentToSave);
+
         return true;
     }
 }

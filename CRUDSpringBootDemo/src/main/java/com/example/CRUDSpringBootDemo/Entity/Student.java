@@ -1,18 +1,23 @@
+
 package com.example.CRUDSpringBootDemo.Entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 @Entity
 public class Student {
 
     @Id
+    @GeneratedValue(strategy =  GenerationType.IDENTITY)
     private long id;
+
     private String name;
     private int age;
     private String email;
     private int rollNo;
     private String subject;
+
+    @Column(nullable = false)
+    private boolean deleted = false;
 
     public long getId() {
         return id;
@@ -60,5 +65,13 @@ public class Student {
 
     public void setSubject(String subject) {
         this.subject = subject;
+    }
+
+    public boolean isDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
     }
 }
